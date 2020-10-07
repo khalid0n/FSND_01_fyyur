@@ -53,7 +53,6 @@ class Venue(db.Model):
     seeking_description = db.Column(db.String(500))
 
     shows = db.relationship("Shows", backref=db.backref('Venue', lazy=True))
-    # artists=db.relationship('Artist', secondary='Shows')
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
@@ -72,8 +71,6 @@ class Artist(db.Model):
     seeking_description = db.Column(db.String(500))
 
     shows = db.relationship("Shows", backref=db.backref('Artist', lazy=True))
-    # venues = db.relationship('Venue', secondary='Shows')
-
 
 
 class Shows(db.Model):
@@ -107,7 +104,6 @@ app.jinja_env.filters['datetime'] = format_datetime
 def index():
   return render_template('pages/home.html')
 
-
 #  Venues
 #  ----------------------------------------------------------------
 
@@ -121,7 +117,7 @@ def venues():
     values = {
       "city": venue.city,
       "state": venue.state,
-      "venues": Venue.query.filter_by(city=venue.city, state=venue.state).all()
+      "venues": Venue.query.filter_by(city=venue.city).all()
     }
     data.append(values)
 
@@ -131,6 +127,7 @@ def venues():
 def search_venues():
 
   search_str = request.form.get('search_term', '')
+  # using 'ilike' for case-insensitivity
   filtered_venue = Venue.query.filter(Venue.name.ilike('%' + search_str + '%'))
 
   response = {
@@ -446,7 +443,7 @@ def create_show_submission():
     venue_id = request.form['venue_id']
     start_time = request.form['start_time']
 
-    show = Shows( artist_id=artist_id, venue_id=venue_id, start_time=start_time)
+    show = Shows(artist_id=artist_id, venue_id=venue_id, start_time=start_time)
     db.session.add(show)
     db.session.commit()
     flash('Show was successfully listed!')
@@ -454,6 +451,7 @@ def create_show_submission():
   except:
     db.session.rollback()
     flash('An error occurred. Show could not be listed.')
+
   finally:
     db.session.close()
 
