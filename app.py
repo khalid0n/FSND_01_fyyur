@@ -103,8 +103,8 @@ def show_venue(venue_id):
     "image_link": venue.image_link,
     "past_shows": past_shows,
     "upcoming_shows": upcoming_shows,
-    "past_shows_count": len(past_shows),
-    "upcoming_shows_count": len(upcoming_shows)
+    "past_shows_count": venue.count_past_shows(),
+    "upcoming_shows_count": venue.count_upcoming_shows()
   }
 
   return render_template('pages/show_venue.html', venue=data)
@@ -184,7 +184,6 @@ def show_artist(artist_id):
 
   artist = Artist.query.get(artist_id)
 
-
   for show in artist.shows:
     tmp_show = {
       "venue_id": show.venue_id,
@@ -213,8 +212,8 @@ def show_artist(artist_id):
     "image_link": artist.image_link,
     "past_shows": past_shows,
     "upcoming_shows": upcoming_shows,
-    "past_shows_count": len(past_shows),
-    "upcoming_shows_count": len(upcoming_shows)
+    "past_shows_count": artist.count_past_shows(),
+    "upcoming_shows_count": artist.count_upcoming_shows()
   }
 
   return render_template('pages/show_artist.html', artist=data)

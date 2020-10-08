@@ -39,6 +39,14 @@ class Venue(db.Model):
 
     shows = db.relationship("Shows", backref=db.backref('Venue', lazy=True))
 
+    def count_past_shows(self):
+        return self.query.join(Shows).filter_by(venue_id=self.id).filter(
+            Shows.start_time < datetime.now()).count()
+
+    def count_upcoming_shows(self):
+        return self.query.join(Shows).filter_by(venue_id=self.id).filter(
+            Shows.start_time > datetime.now()).count()
+
 class Artist(db.Model):
     __tablename__ = 'Artist'
 
@@ -57,16 +65,26 @@ class Artist(db.Model):
 
     shows = db.relationship("Shows", backref=db.backref('Artist', lazy=True))
 
-    def get_past_shows(self):
+    def count_past_shows(self):
         return self.query.join(Shows).filter_by(artist_id=self.id).filter(
-            Shows.start_time < datetime.now())
+            Shows.start_time < datetime.now()).count()
+
+    def count_upcoming_shows(self):
+        return self.query.join(Shows).filter_by(artist_id=self.id).filter(
+            Shows.start_time > datetime.now()).count()
 
 
 class Shows(db.Model):
-  __tablename__ = 'Shows'
+    __tablename__ = 'Shows'
 
-  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-  artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
-  venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
-  start_time = db.Column('start_time', db.DateTime)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
+    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
+    start_time = db.Column('start_time', db.DateTime)
+
+    # @classmethod
+    # def get_past_by_venue(cls, venue_id):
+    #     shows = cls.query.filter_by(venue_id=venue_id).filter(cls.start_time < datetime.now()).all()
+    #     return [show for show in shows]
+
 
